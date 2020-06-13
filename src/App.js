@@ -12,34 +12,25 @@ import CreateCourse from './components/courses/CreateCourse';
 import UpdateCourse from './components/courses/UpdateCourse';
 import PrivateRoute from './PrivateRoute';
 import UserSignOut from './components/users/UserSignOut';
-import withContext from './Context';
 
 const App = () => {
-  const UserSignUpWithContext = withContext(UserSignUp);
-  const UserSignInWithContext = withContext(UserSignIn);
-  const HeaderWithContext = withContext(Header);
-  const UserSignOutWithContext = withContext(UserSignOut);
-  const CourseDetailWithContext = withContext(CourseDetail);
-  const CreateCourseWithContext = withContext(CreateCourse);
-  const UpdateCourseWithContext = withContext(UpdateCourse);
-
   return (
     <Router>
-      <HeaderWithContext />
+      <Header />
       <Switch>
         <Route exact path="/" component={Courses} />
         <PrivateRoute
           path="/courses/create"
-          component={CreateCourseWithContext}
+          component={CreateCourse}
         />
         <PrivateRoute
           path="/courses/:id/update"
-          component={UpdateCourseWithContext}
+          component={UpdateCourse}
         />
-        <Route path="/courses/:id" component={CourseDetailWithContext} />
-        <Route path="/signin" component={UserSignInWithContext} />
-        <Route path="/signup" component={UserSignUpWithContext} />
-        <Route path="/signout" component={UserSignOutWithContext} />
+        <Route path="/courses/:id" component={CourseDetail} />
+        <Route path="/signin" component={UserSignIn} />
+        <Route path="/signup" component={UserSignUp} />
+        <Route path="/signout" component={UserSignOut} />
         <Route path="/forbidden" component={Forbidden} />
         <Route path="/error" component={UnhandledError} />
         <Route component={NotFound} />

@@ -1,8 +1,7 @@
 import React from 'react';
 
-export default props => {
-  const { cancel, errors, submit, submitButtonText, elements } = props;
-
+export default ({ cancel, errors, submit, submitButtonText, elements}) => {
+  
   function handleSubmit(event) {
     event.preventDefault();
     submit();
@@ -34,8 +33,8 @@ export default props => {
 function ErrorsDisplay({ errors }) {
   let errorsDisplay = null;
 
-  if (errors.length) {
-    errorsDisplay = (
+  if (errors.length > 0) {
+     errorsDisplay = (
       <div>
         <h2 className="validation--errors--label">Validation errors</h2>
         <div className="validation-errors">
@@ -48,6 +47,5 @@ function ErrorsDisplay({ errors }) {
       </div>
     );
   }
-
-  return errorsDisplay;
+  return errorsDisplay
 }

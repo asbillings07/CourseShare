@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-const Header = ({ context }) => {
-  const authUser = context.authedUser;
+import { useSelector } from 'react-redux'
+const Header = () => {
+  const { authedUser } = useSelector(state => state.authSlice)
+  const authUser = authedUser
   return (
     <div className="header">
       <div className="bounds">

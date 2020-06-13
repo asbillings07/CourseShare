@@ -1,25 +1,44 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Form from './Form';
+import { useDispatch, useSelector } from 'react-redux'
+import { signIn } from '../../redux/Slices/auth'
 
-export default class UserSignIn extends Component {
-  state = {
-    email: '',
-    password: '',
-    errors: [],
+const UserSignIn = ({ history, location }) => {
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const { loading, userSignedIn, authedUser, errors } = useSelector(state => state.authSlice)
+  console.log({ loading, userSignedIn, authedUser, errors })
+  const dispatch = useDispatch()
+
+  const { from } = location.state || {
+    from: { pathname: '/' },
   };
 
-  render() {
-    const { email, password, errors } = this.state;
+  useEffect(() => {
+    if (userSignedIn) {
+      history.push(from)
+    }
+  }, [userSignedIn])
+
+  
+
+  const submit = () => dispatch(signIn(email, password))
+  
+  const cancel = () => history.push('/')
+
+  if (userSignedIn) return <Link to='/' />
 
     return (
       <div className="bounds">
         <div className="grid-33 centered signin">
           <h1>Sign In</h1>
           <Form
-            cancel={this.cancel}
+            cancel={cancel}
             errors={errors}
-            submit={this.submit}
+            submit={submit}
             submitButtonText="Sign In"
             elements={() => (
               <React.Fragment>
@@ -28,7 +47,7 @@ export default class UserSignIn extends Component {
                   name="email"
                   type="text"
                   value={email}
-                  onChange={this.change}
+                  onChange={e => setEmail(e.target.value)}
                   placeholder="Email Address"
                 />
                 <input
@@ -36,7 +55,7 @@ export default class UserSignIn extends Component {
                   name="password"
                   type="password"
                   value={password}
-                  onChange={this.change}
+                  onChange={e => setPassword(e.target.value)}
                   placeholder="Password"
                 />
               </React.Fragment>
@@ -49,45 +68,9 @@ export default class UserSignIn extends Component {
         </div>
       </div>
     );
-  }
 
-  change = event => {
-    const name = event.target.name;
-    const value = event.target.value;
 
-    this.setState(() => {
-      return {
-        [name]: value,
-      };
-    });
-  };
-
-  submit = () => {
-    const { context } = this.props;
-    const { from } = this.props.location.state || {
-      from: { pathname: '/' },
-    };
-    const { email, password } = this.state;
-
-    context.actions
-      .signIn(email, password)
-      .then(user => {
-        if (user === null) {
-          this.setState(() => {
-            return { errors: ['Sign-In was unsuccessful!'] };
-          });
-        } else {
-          this.props.history.push(from);
-          console.log(`User Signed in Successfully`);
-        }
-      })
-      .catch(err => {
-        console.log(err);
-        this.props.history.push('/errors');
-      });
-  };
-
-  cancel = () => {
-    this.props.history.push('/');
-  };
+ 
 }
+
+export default UserSignIn

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import AddCourse from './AddCourse';
 import Spinner from '../Spinner';
-import config from '../../config';
+import config from '../../Config';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
