@@ -10,7 +10,7 @@ import withReactContent from 'sweetalert2-react-content'
 
 const MySwal = withReactContent(Swal)
 
-export const CourseDetail = ({ match }) => {
+export const CourseDetail = ({ match, history }) => {
 
   const [message, setMessage] = useState('')
   const { firstName, lastName, loading, course, errors } = useSelector(state => state.courseSlice)
@@ -27,6 +27,12 @@ export const CourseDetail = ({ match }) => {
   setMessage(errors)
  }, [errors])
 
+ const courseDelete = () => {
+  const { id } = match.params;
+  const { emailAddress } = authedUser
+  dispatch(deleteCourse(emailAddress, id))
+  history.push('/')
+};
   // function that confirms if user wants to delete course
   const confirmDelete = () => {
     Swal.fire({
@@ -44,16 +50,12 @@ export const CourseDetail = ({ match }) => {
           'Your file has been deleted.',
           'success'
         )
-        // deleteCourse()
+        courseDelete()
       }
     })
   };
   // deletes course from REST API via delete method
-  const deleteCourse = () => {
-    const { id } = match.params;
-    const { emailAddress } = authedUser
-    dispatch(deleteCourse(emailAddress, id)) 
-  };
+
 
 return loading ? <Spinner size="4x" spinning="spinning" /> : (
       <div>
