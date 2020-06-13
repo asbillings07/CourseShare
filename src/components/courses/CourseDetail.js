@@ -1,76 +1,61 @@
-import React, { Component } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import config from '../../Config';
+import Spinner from '../Spinner';
+import { getCourse, deleteCourse } from "../../redux/Slices/courseSlice";
+import { useDispatch, useSelector } from 'react-redux';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
-export default class CourseDetail extends Component {
-  state = {
-    firstName: '',
-    lastName: '',
-    course: [],
-    message: '',
-  };
 
-  componentDidMount() {
-    this.getCourses();
-  }
-  // function pulls only the requested course from REST API
-  getCourses = async () => {
-    const { id } = this.props.match.params;
-    try {
-      const data = await axios.get(`${config.apiBaseUrl}/courses/${id}`);
+const MySwal = withReactContent(Swal)
 
-      if (data) {
-        const course = data.data[0];
-        this.setState({
-          course,
-          firstName: course.user.firstName,
-          lastName: course.user.lastName,
-        });
-      } else {
-        throw Error();
-      }
-    } catch (err) {
-      console.log(err);
-      this.props.history.push('/notfound');
-    }
-  };
+export const CourseDetail = ({ match }) => {
+
+  const [message, setMessage] = useState('')
+  const { firstName, lastName, loading, course, errors } = useSelector(state => state.courseSlice)
+  const { authedUser } = useSelector(state => state.authSlice)
+  const dispatch = useDispatch()
+
+ useEffect(() => {
+  const { id } = match.params;
+  dispatch(getCourse(id))
+  
+ }, [match.params, dispatch])
+
+ useEffect(() => {
+  setMessage(errors)
+ }, [errors])
+
   // function that confirms if user wants to delete course
-  confirmDelete = () => {
-    const deleteIt = window.confirm(
-      'Careful...Are you sure you want to delete this course? There is no going back.'
-    );
-    if (deleteIt) {
-      this.deleteCourse();
-    } else {
-    }
+  const confirmDelete = () => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.value) {
+        Swal.fire(
+          'Deleted!',
+          'Your file has been deleted.',
+          'success'
+        )
+        // deleteCourse()
+      }
+    })
   };
   // deletes course from REST API via delete method
-  deleteCourse = () => {
-    const { id } = this.props.match.params;
-    const { authedUser } = this.props.context;
-    const { data } = this.props.context;
-    const { context } = this.props;
-
-    data
-      .deleteCourse(authedUser.emailAddress, context.password, id)
-      .then(errors => {
-        if (errors.length) {
-          this.setState({ message: errors });
-        } else {
-          alert('Course Deleted Successfully');
-          this.props.history.push('/');
-        }
-      });
+  const deleteCourse = () => {
+    const { id } = match.params;
+    const { emailAddress } = authedUser
+    dispatch(deleteCourse(emailAddress, id)) 
   };
 
-  render() {
-    const { course, firstName, lastName } = this.state;
-    const { authedUser } = this.props.context;
-    const pMarkdown = `${course.description}`;
-    const liMarkdown = `${course.materialsNeeded}`;
-    return (
+return loading ? <Spinner size="4x" spinning="spinning" /> : (
       <div>
         <div className="actions--bar">
           <div className="bounds">
@@ -88,7 +73,7 @@ export default class CourseDetail extends Component {
                 {authedUser && authedUser.id === course.userId ? (
                   <button
                     className="button"
-                    onClick={() => this.confirmDelete()}
+                    onClick={() => confirmDelete()}
                   >
                     Delete Course
                   </button>
@@ -104,14 +89,14 @@ export default class CourseDetail extends Component {
         </div>
         <div className="bounds course--detail">
           <div className="grid-66">
-            <h2>{this.state.message}</h2>
+            <h2>{message}</h2>
             <div className="course--header">
               <h4 className="course--label">Course</h4>
               <h3 className="course--title">{course.title}</h3>
               <p>By Author: {`${firstName} ${lastName}`} </p>
             </div>
             <div className="course--description">
-              <ReactMarkdown source={pMarkdown} />
+              <ReactMarkdown source={`${course.description}`} />
             </div>
           </div>
           <div className="grid-25 grid-right">
@@ -124,7 +109,7 @@ export default class CourseDetail extends Component {
                 <li className="course--stats--list--item">
                   <h4>Materials Needed</h4>
                   <ul>
-                    <ReactMarkdown source={liMarkdown} />
+                    <ReactMarkdown source={`${course.materialsNeeded}`} />
                   </ul>
                 </li>
               </ul>
@@ -133,5 +118,5 @@ export default class CourseDetail extends Component {
         </div>
       </div>
     );
-  }
+  
 }

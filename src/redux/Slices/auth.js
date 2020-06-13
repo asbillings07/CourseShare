@@ -5,7 +5,7 @@ import { request } from "../../Data";
 const initialState = {
     loading: false,
     userSignedIn: false,
-    authedUser: Cookies.getJSON('authedUser') || null,
+    authedUser: null,
     password: Cookies.get('password') || null,
     errors: []
 }
@@ -19,7 +19,6 @@ const authSlice = createSlice({
           },
         userSignIn: (state, action) => {
             state.authedUser = action.payload
-            Cookies.set('authedUser', JSON.stringify(state.authedUser), { expires: 7 });
             state.userSignedIn = true
             state.errorMessage = null
             toggleLoading()
