@@ -12,13 +12,16 @@ import CreateCourse from './components/courses/CreateCourse';
 import UpdateCourse from './components/courses/UpdateCourse';
 import PrivateRoute from './PrivateRoute';
 import UserSignOut from './components/users/UserSignOut';
+import { reduxConnnect } from './redux/reduxHOC'
+
+const HeaderWithRedux = reduxConnnect(Header)
 
 const App = () => {
   return (
     <Router>
-      <Header />
+      <HeaderWithRedux />
       <Switch>
-        <Route exact path="/" component={Courses} />
+        <Route exact path="/" component={reduxConnnect(Courses)} />
         <PrivateRoute
           path="/courses/create"
           component={CreateCourse}
@@ -27,10 +30,10 @@ const App = () => {
           path="/courses/:id/update"
           component={UpdateCourse}
         />
-        <Route path="/courses/:id" component={CourseDetail} />
-        <Route path="/signin" component={UserSignIn} />
+        <Route path="/courses/:id" component={reduxConnnect(CourseDetail)} />
+        <Route path="/signin" component={reduxConnnect(UserSignIn)} />
         <Route path="/signup" component={UserSignUp} />
-        <Route path="/signout" component={UserSignOut} />
+        <Route path="/signout" component={reduxConnnect(UserSignOut)} />
         <Route path="/forbidden" component={Forbidden} />
         <Route path="/error" component={UnhandledError} />
         <Route component={NotFound} />

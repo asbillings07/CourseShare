@@ -6,15 +6,18 @@ import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
 import { createStore } from './redux/configureStore'
 import { PersistGate } from "redux-persist/lib/integration/react"
+import { createConnect } from './Hooks'
 
 const [store, persistor ] = createStore()
 
+
 ReactDOM.render(
-  <Provider store={store}>
-    <PersistGate persistor={persistor}>
-    <App />
-    </PersistGate>
-  </Provider>,
+  // <Provider store={store}>
+  //   <PersistGate persistor={persistor}>
+  //   <App />
+  //   </PersistGate>
+  // </Provider>,
+  <App />,
 
   document.getElementById('root')
 );
