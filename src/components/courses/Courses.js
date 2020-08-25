@@ -1,35 +1,24 @@
-import React, { Component } from 'react';
-import axios from 'axios';
+import React, { useEffect } from 'react';
 import AddCourse from './AddCourse';
 import Spinner from '../Spinner';
-import config from '../../config';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllCourses } from "../../redux/Slices/courseSlice";
 
-export default class Courses extends Component {
-  state = {
-    courses: [],
-    loading: true,
-  };
+export const Courses = () => {
 
-  componentDidMount() {
-    this.getAllCourses();
-  }
-  // function pulls all courses from REST API
-  getAllCourses = async () => {
-    const courses = await axios
-      .get(`${config.apiBaseUrl}/courses`)
-      .catch(err => {
-        console.log(err.status);
-        this.props.history.push('/error');
-      });
-    if (courses) {
-      this.setState({ courses: courses.data, loading: false });
-    }
-  };
+  const dispatch = useDispatch()
+  const { loading, courseData, errors } = useSelector(state => state.courseSlice)
+
+  useEffect(() => {
+    dispatch(getAllCourses())
+  }, [dispatch])
+
+
   // maps through all of the courses and displays them on the "/" page
-  showCourse = () => {
-    return this.state.courses.map(course => (
+  const showCourse = () => {
+    return courseData.map(course => (
       <React.Fragment key={course.id}>
         <div className="grid">
           <Link
@@ -41,21 +30,18 @@ export default class Courses extends Component {
           </Link>
         </div>
       </React.Fragment>
-    ));
+    ))
   };
 
-  render() {
-    if (this.state.loading) {
-      return <Spinner size="4x" spinning="spinning" />;
-    } else {
-      return (
+  
+return errors ? <div>{errors}</div> : loading ? <Spinner size="4x" spinning="spinning" /> : (
         <React.Fragment>
-          {this.showCourse()}
+          {showCourse()}
           <AddCourse />
         </React.Fragment>
       );
-    }
-  }
+    
+  
 }
 
 const FlexText = styled.h3`

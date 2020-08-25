@@ -1,12 +1,13 @@
 const mongoose = require('mongoose')
 const logger = require('./logger')
+const { db } = require('./config/configOpt')
 
 // Models
 
 const User = require('./models/User')
 const Course = require('./models/Course')
 
-module.exports = config => {
+module.exports = (config) => {
   const options = {
     server: {
       reconnectTries: Number.MAX_VALUE
@@ -21,6 +22,7 @@ module.exports = config => {
   }
 
   const connectToDB = () => {
+    console.log(db)
     mongoose.connect(process.env.MONGO_URL, options)
   }
 
@@ -31,12 +33,12 @@ module.exports = config => {
   })
 
   // If the connection throws an error
-  mongoose.connection.on('error', err => {
+  mongoose.connection.on('error', (err) => {
     logger.debug('Mongoose default connection error: ' + err)
   })
 
   // When the connection is disconnected
-  mongoose.connection.on('disconnected', event => {
+  mongoose.connection.on('disconnected', (event) => {
     logger.debug('Mongoose default connection disconnected' + event)
     logger.debug('Reconnecting...')
     connectToDB()
